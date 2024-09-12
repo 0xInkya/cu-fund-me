@@ -3,8 +3,8 @@
 pragma solidity ^0.8.18;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {PriceConverter} from "src/PriceConverter.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
+import {PriceConverter} from "src/PriceConverter.sol";
 import {FundMe} from "src/FundMe.sol";
 
 contract TestFundMe is Test {
@@ -38,7 +38,9 @@ contract TestFundMe is Test {
         vm.deal(USER, STARTING_BALANCE);
     }
 
-    /** FUNCTIONS */
+    /**
+     * FUNCTIONS
+     */
     function testFundAddsFunderToArray() external {
         // Arrange
         address expectedAddress = USER;
@@ -76,7 +78,6 @@ contract TestFundMe is Test {
         assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
     }
 
-
     function testFallbackCallsFund() external {
         vm.prank(USER);
         // Theres no function with this selector, so fallback is triggered
@@ -87,7 +88,9 @@ contract TestFundMe is Test {
         assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
     }
 
-    /** EVENTS */
+    /**
+     * EVENTS
+     */
     function testFundEmitsEvent() external {
         vm.prank(USER);
         vm.expectEmit(true, true, false, false);
@@ -102,7 +105,9 @@ contract TestFundMe is Test {
         fundMe.withdraw();
     }
 
-    /** ERRORS */
+    /**
+     * ERRORS
+     */
     function testFundRevertsWithErrorIfNotEnoughUsd() external {
         vm.prank(USER);
         vm.expectRevert(FundMe.FundMe__NotEnoughUsd.selector);

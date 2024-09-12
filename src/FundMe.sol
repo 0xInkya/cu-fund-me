@@ -28,7 +28,7 @@ import {AggregatorV3Interface} from "@chainlink/contracts/v0.8/interfaces/Aggreg
 import {PriceConverter} from "src/PriceConverter.sol";
 
 /**
- * @title Fund Me
+ * @title FundMe
  * @author Inkya
  * @notice Implementation of the FundMe contract from Cyfrin Updraft from 0, following best practices and improving on the original code by implementing ideas learned in later projects.
  * Functionality:
@@ -48,7 +48,7 @@ contract FundMe {
     address private immutable i_owner;
     address private immutable i_priceFeed;
     address[] private s_funders;
-    mapping(address funder => uint256 amountFunded) s_funderToAmountFunded;
+    mapping(address funder => uint256 amountFunded) private s_funderToAmountFunded;
 
     event FundMe__ContractFunded(address indexed funder, uint256 indexed amountFunded);
     event FundMe__ContractWithdrawn(uint256 indexed amountWithdrawn);

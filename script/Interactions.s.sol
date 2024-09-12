@@ -3,14 +3,12 @@
 pragma solidity ^0.8.18;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {FundMe} from "src/FundMe.sol";
 import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
-
+import {FundMe} from "src/FundMe.sol";
 
 /**
  * All functions in this contract are called by the account passed to Foundry
  */
-
 contract FundFundMe is Script {
     uint256 SEND_VALUE = 0.01 ether;
 
