@@ -4,6 +4,7 @@ out = "out"
 libs = ["lib"]
 remappings = [
     "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/src/",
+    "@foundry-devlops=lib/foundry-devlops/",
 ]
 fs_permissions = [
     { access = "read", path = "./broadcast" },

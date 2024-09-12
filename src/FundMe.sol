@@ -44,7 +44,7 @@ contract FundMe {
 
     using PriceConverter for uint256;
 
-    uint256 private constant MINIMUM_USD = 10;
+    uint256 private constant MINIMUM_USD = 5 * 10 ** 18;
     address private immutable i_owner;
     address private immutable i_priceFeed;
     address[] private s_funders;
@@ -89,7 +89,7 @@ contract FundMe {
         s_funders = new address[](0); // (0) specifies the initial length of the array
 
         /* Withdrawing funds from contract */
-        (bool success,) = address(this).call{value: address(this).balance}("");
+        (bool success,) = i_owner.call{value: address(this).balance}("");
         if (!success) revert FundMe__WithdrawFailed();
         emit FundMe__ContractWithdrawn(amountWithdrawn);
     }

@@ -3,7 +3,6 @@
 pragma solidity ^0.8.18;
 
 import {Script} from "forge-std/Script.sol";
-import {FundMe} from "src/FundMe.sol";
 import {MockV3Aggregator} from "test/mocks/MockV3Aggregator.sol";
 
 contract HelperConfig is Script {
@@ -17,28 +16,27 @@ contract HelperConfig is Script {
     }
 
     constructor() {
-        if (block.chainid == 1) activeNetworkConfig = getEthereumMainnetConfig();
-        else if (block.chainid == 11155111) activeNetworkConfig = getEthereumSepoliaConfig();
-        else activeNetworkConfig = getOrCreateAnvilNetworkConfig();
+        if (block.chainid == 1) activeNetworkConfig = getMainnetConfig();
+        else if (block.chainid == 11155111) activeNetworkConfig = getSepoliaConfig();
+        else activeNetworkConfig = getOrCreateAnvilConfig();
     }
 
-    function getEthereumMainnetConfig() public pure returns (NetworkConfig memory) {
+    function getMainnetConfig() public pure returns (NetworkConfig memory) {
         return NetworkConfig({priceFeed: 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419});
     }
 
-    function getEthereumSepoliaConfig() public pure returns (NetworkConfig memory) {
+    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
         return NetworkConfig({priceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306});
     }
 
-    function getOrCreateAnvilNetworkConfig() public returns (NetworkConfig memory) {
+    function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
         // Get
         if (activeNetworkConfig.priceFeed != address(0)) return activeNetworkConfig;
 
         // Create
-        MockV3Aggregator mock;
         vm.startBroadcast();
-        mock = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);
         vm.stopBroadcast();
-        return NetworkConfig({priceFeed: address(mock)});
+        return NetworkConfig({priceFeed: address(mockPriceFeed)});
     }
 }

@@ -38,6 +38,7 @@ contract TestFundMe is Test {
         vm.deal(USER, STARTING_BALANCE);
     }
 
+    /** FUNCTIONS */
     function testFundAddsFunderToArray() external {
         // Arrange
         address expectedAddress = USER;
@@ -66,6 +67,27 @@ contract TestFundMe is Test {
         assertEq(expectedAmount, actualAmount);
     }
 
+    function testReceiveCallsFund() external {
+        vm.prank(USER);
+        (bool success,) = address(fundMe).call{value: FUND_VALUE}("");
+
+        assert(success);
+        assertEq(USER, fundMe.getFunder(0));
+        assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
+    }
+
+
+    function testFallbackCallsFund() external {
+        vm.prank(USER);
+        // Theres no function with this selector, so fallback is triggered
+        (bool success,) = address(fundMe).call{value: FUND_VALUE}("0x12345678");
+
+        assert(success);
+        assertEq(USER, fundMe.getFunder(0));
+        assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
+    }
+
+    /** EVENTS */
     function testFundEmitsEvent() external {
         vm.prank(USER);
         vm.expectEmit(true, true, false, false);
@@ -80,6 +102,7 @@ contract TestFundMe is Test {
         fundMe.withdraw();
     }
 
+    /** ERRORS */
     function testFundRevertsWithErrorIfNotEnoughUsd() external {
         vm.prank(USER);
         vm.expectRevert(FundMe.FundMe__NotEnoughUsd.selector);

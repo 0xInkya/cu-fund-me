@@ -7,7 +7,7 @@ import {FundMe} from "src/FundMe.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
 
 contract DeployFundMe is Script {
-    function run() public returns (FundMe) {
+    function run() external returns (FundMe) {
         HelperConfig helperConfig = new HelperConfig();
         address priceFeed = helperConfig.activeNetworkConfig(); // why does helperConfig.activeNetworkConfig.priceFeed not work here?
 
