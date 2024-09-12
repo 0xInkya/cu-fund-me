@@ -58,6 +58,9 @@ contract FundMe {
         _;
     }
 
+    /**
+     * FUNCTIONS
+     */
     constructor(address priceFeed) {
         i_owner = msg.sender;
         i_priceFeed = priceFeed;
@@ -115,7 +118,7 @@ contract FundMe {
     }
 
     /**
-     * Getters
+     * GETTERS
      */
     function getOwner() public view returns (address) {
         return i_owner;
