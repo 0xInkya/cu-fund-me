@@ -1,8 +1,8 @@
 // Layout of Contract:
 // version
 // imports
-// errors
 // natspec
+// errors
 // interfaces, libraries, contracts
 // Type declarations
 // State variables
@@ -38,29 +38,44 @@ import {PriceConverter} from "src/PriceConverter.sol";
  * 4. Records are reset when withdrawing
  */
 contract FundMe {
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
     error FundMe__NotEnoughUsd();
     error FundMe__NotOwner();
     error FundMe__WithdrawFailed();
 
+    /*//////////////////////////////////////////////////////////////
+                               CONTRACTS
+    //////////////////////////////////////////////////////////////*/
     using PriceConverter for uint256;
 
+    /*//////////////////////////////////////////////////////////////
+                            STATE VARIABLES
+    //////////////////////////////////////////////////////////////*/
     uint256 private constant MINIMUM_USD = 5 * 10 ** 18;
     address private immutable i_owner;
     address private immutable i_priceFeed;
     address[] private s_funders;
     mapping(address funder => uint256 amountFunded) private s_funderToAmountFunded;
 
+    /*//////////////////////////////////////////////////////////////
+                                 EVENTS
+    //////////////////////////////////////////////////////////////*/
     event FundMe__ContractFunded(address indexed funder, uint256 indexed amountFunded);
     event FundMe__ContractWithdrawn(uint256 indexed amountWithdrawn);
 
+    /*//////////////////////////////////////////////////////////////
+                               MODIFIERS
+    //////////////////////////////////////////////////////////////*/
     modifier onlyOwner() {
         if (msg.sender != i_owner) revert FundMe__NotOwner();
         _;
     }
 
-    /**
-     * FUNCTIONS
-     */
+    /*//////////////////////////////////////////////////////////////
+                               FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
     constructor(address priceFeed) {
         i_owner = msg.sender;
         i_priceFeed = priceFeed;
@@ -117,9 +132,9 @@ contract FundMe {
         fund();
     }
 
-    /**
-     * GETTERS
-     */
+    /*//////////////////////////////////////////////////////////////
+                                GETTERS
+    //////////////////////////////////////////////////////////////*/
     function getOwner() public view returns (address) {
         return i_owner;
     }

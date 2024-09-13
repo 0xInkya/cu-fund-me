@@ -38,9 +38,9 @@ contract TestFundMe is Test {
         vm.deal(USER, STARTING_BALANCE);
     }
 
-    /**
-     * FUNCTIONS
-     */
+    /*//////////////////////////////////////////////////////////////
+                               FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
     function testFundAddsFunderToArray() external {
         // Arrange
         address expectedAddress = USER;
@@ -88,9 +88,9 @@ contract TestFundMe is Test {
         assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
     }
 
-    /**
-     * EVENTS
-     */
+    /*//////////////////////////////////////////////////////////////
+                                 EVENTS
+    //////////////////////////////////////////////////////////////*/
     function testFundEmitsEvent() external {
         vm.prank(USER);
         vm.expectEmit(true, true, false, false);
@@ -105,9 +105,9 @@ contract TestFundMe is Test {
         fundMe.withdraw();
     }
 
-    /**
-     * ERRORS
-     */
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
     function testFundRevertsWithErrorIfNotEnoughUsd() external {
         vm.prank(USER);
         vm.expectRevert(FundMe.FundMe__NotEnoughUsd.selector);
