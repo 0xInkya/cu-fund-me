@@ -13,16 +13,18 @@ contract TestFundMe is Test {
      * In other words, we can't use the deploy script.
      * I'm not sure if we are supposed to use deploy scripts in unit tests or only on integrations tests anyway.
      */
+    error TestFundMe__CallUnsuccessful();
+
     FundMe fundMe;
 
-    address DEPLOYER = makeAddr("DEPLOYER");
-    address USER = makeAddr("USER");
+    address OWNER = makeAddr("owner");
+    address FUNDER = makeAddr("funder");
 
     uint256 STARTING_BALANCE = 10 ether;
     uint256 FUND_VALUE = 1 ether;
 
     modifier userFunded() {
-        vm.prank(USER);
+        vm.prank(FUNDER);
         fundMe.fund{value: FUND_VALUE}();
         _;
     }
@@ -31,92 +33,109 @@ contract TestFundMe is Test {
         HelperConfig helperConfig = new HelperConfig();
         address priceFeed = helperConfig.getConfig().priceFeed;
 
-        vm.prank(DEPLOYER);
+        vm.prank(OWNER);
         fundMe = new FundMe(priceFeed);
 
-        vm.deal(DEPLOYER, STARTING_BALANCE);
-        vm.deal(USER, STARTING_BALANCE);
+        vm.deal(OWNER, STARTING_BALANCE);
+        vm.deal(FUNDER, STARTING_BALANCE);
     }
 
     /*//////////////////////////////////////////////////////////////
-                               FUNCTIONS
-    //////////////////////////////////////////////////////////////*/
-    function testFundAddsFunderToArray() external {
-        // Arrange
-        address expectedAddress = USER;
-        address actualAddress;
-
-        // Act
-        vm.prank(USER);
-        fundMe.fund{value: FUND_VALUE}();
-        actualAddress = fundMe.getFunder(0);
-
-        // Assert
-        assertEq(expectedAddress, actualAddress);
-    }
-
-    function testFundAddsAmountFundedToMapping() external {
-        // Arrange
-        uint256 expectedAmount = FUND_VALUE;
-        uint256 actualAmount;
-
-        // Act
-        vm.prank(USER);
-        fundMe.fund{value: expectedAmount}();
-        actualAmount = fundMe.getAmountFunded(USER);
-
-        // Assert
-        assertEq(expectedAmount, actualAmount);
-    }
-
-    function testReceiveCallsFund() external {
-        vm.prank(USER);
-        (bool success,) = address(fundMe).call{value: FUND_VALUE}("");
-
-        assert(success);
-        assertEq(USER, fundMe.getFunder(0));
-        assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
-    }
-
-    function testFallbackCallsFund() external {
-        vm.prank(USER);
-        // Theres no function with this selector, so fallback is triggered
-        (bool success,) = address(fundMe).call{value: FUND_VALUE}("0x12345678");
-
-        assert(success);
-        assertEq(USER, fundMe.getFunder(0));
-        assertEq(FUND_VALUE, fundMe.getAmountFunded(USER));
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                                 EVENTS
-    //////////////////////////////////////////////////////////////*/
-    function testFundEmitsEvent() external {
-        vm.prank(USER);
-        vm.expectEmit(true, true, false, false);
-        emit FundMe.FundMe__ContractFunded(USER, FUND_VALUE);
-        fundMe.fund{value: FUND_VALUE}();
-    }
-
-    function testWithdrawEmitsEvent() external userFunded {
-        vm.prank(DEPLOYER);
-        vm.expectEmit(true, false, false, false);
-        emit FundMe.FundMe__ContractWithdrawn(address(fundMe).balance);
-        fundMe.withdraw();
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                                 ERRORS
+                                  FUND
     //////////////////////////////////////////////////////////////*/
     function testFundRevertsWithErrorIfNotEnoughUsd() external {
-        vm.prank(USER);
+        vm.prank(FUNDER);
         vm.expectRevert(FundMe.FundMe__NotEnoughUsd.selector);
         fundMe.fund();
     }
 
+    function testFundAddsFunderToArray() external {
+        // Arrange / Act
+        vm.prank(FUNDER);
+        fundMe.fund{value: FUND_VALUE}();
+
+        // Assert
+        assertEq(FUNDER, fundMe.getFunder(0));
+    }
+
+    function testFundAddsAmountFundedToMapping() external {
+        // Arrange / Act
+        vm.prank(FUNDER);
+        fundMe.fund{value: FUND_VALUE}();
+
+        // Assert
+        assertEq(FUND_VALUE, fundMe.getAmountFunded(FUNDER));
+    }
+
+    function testFundEmitsEvent() external {
+        vm.expectEmit(true, true, false, false);
+        emit FundMe.FundMe__ContractFunded(FUNDER, FUND_VALUE);
+        vm.prank(FUNDER);
+        fundMe.fund{value: FUND_VALUE}();
+    }
+
+    function testReceiveCallsFund() external {
+        vm.expectEmit(true, true, false, false);
+        emit FundMe.FundMe__ContractFunded(FUNDER, FUND_VALUE);
+        vm.prank(FUNDER);
+        (bool success,) = address(fundMe).call{value: FUND_VALUE}("");
+        if (!success) revert TestFundMe__CallUnsuccessful();
+    }
+
+    function testFallbackCallsFund() external {
+        vm.expectEmit(true, true, false, false);
+        emit FundMe.FundMe__ContractFunded(FUNDER, FUND_VALUE);
+        vm.prank(FUNDER);
+        (bool success,) = address(fundMe).call{value: FUND_VALUE}("0x12345678"); // Theres no function with this selector, so fallback is triggered
+        if (!success) revert TestFundMe__CallUnsuccessful();
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                WITHDRAW
+    //////////////////////////////////////////////////////////////*/
     function testWithdrawRevertsWithErrorIfNotOwner() external userFunded {
-        vm.prank(USER);
         vm.expectRevert(FundMe.FundMe__NotOwner.selector);
+        vm.prank(FUNDER);
+        fundMe.withdraw();
+    }
+
+    function testWithdrawResetsFundersArray() external userFunded {
+        // Arrange / Act
+        vm.prank(OWNER);
+        fundMe.withdraw();
+
+        // Assert
+        vm.expectRevert();
+        fundMe.getFunder(0);
+    }
+
+    function testWithdrawResetsFunderToAmountFundedMapping() external userFunded {
+        // Arrange / Act
+        vm.prank(OWNER);
+        fundMe.withdraw();
+
+        // Assert
+        assertEq(fundMe.getAmountFunded(FUNDER), 0);
+    }
+
+    function testWithdrawPaysOwner() external userFunded {
+        // Arrange
+        uint256 balanceAfterUserFunded = address(fundMe).balance;
+        uint256 ownerBalanceBeforeWithdrawing = OWNER.balance;
+
+        // Act
+        vm.prank(OWNER);
+        fundMe.withdraw();
+
+        // Assert
+        uint256 ownerBalanceAfterWithdrawing = OWNER.balance;
+        assert((balanceAfterUserFunded + ownerBalanceBeforeWithdrawing) == ownerBalanceAfterWithdrawing);
+    }
+
+    function testWithdrawEmitsEvent() external userFunded {
+        vm.expectEmit(true, false, false, false);
+        emit FundMe.FundMe__ContractWithdrawn(address(fundMe).balance);
+        vm.prank(OWNER);
         fundMe.withdraw();
     }
 }
