@@ -34,6 +34,10 @@ jobs:
           forge fmt --check
         id: fmt
 
+      # Run make install at the start
+      - name: Run make install
+        run: make install
+
       - name: Run Forge build
         run: |
           forge build --sizes
@@ -43,7 +47,3 @@ jobs:
         run: |
           forge test -vvv
         id: test
-
-      # Run make install at the start
-      - name: Run make install
-        run: make install
