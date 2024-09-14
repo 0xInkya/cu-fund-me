@@ -18,7 +18,7 @@ abstract contract Constants {
 contract HelperConfig is Script, Constants {
     error HelperConfig__ChainNotFound();
 
-    NetworkConfig public activeNetworkConfig;
+    NetworkConfig public anvilNetworkConfig;
     mapping(uint256 chainId => NetworkConfig) networkConfigs;
 
     uint8 public DECIMALS = 8;
@@ -45,13 +45,14 @@ contract HelperConfig is Script, Constants {
 
     function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
         /* Get */
-        if (activeNetworkConfig.priceFeed != address(0)) return activeNetworkConfig;
+        if (anvilNetworkConfig.priceFeed != address(0)) return anvilNetworkConfig;
 
         /* Create */
         vm.startBroadcast();
         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);
         vm.stopBroadcast();
-        return NetworkConfig({priceFeed: address(mockPriceFeed)});
+        anvilNetworkConfig = NetworkConfig({priceFeed: address(mockPriceFeed)});
+        return anvilNetworkConfig;
     }
 
     function getSepoliaConfig() public pure returns (NetworkConfig memory) {

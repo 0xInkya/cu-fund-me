@@ -9,7 +9,7 @@ import {FundMe} from "src/FundMe.sol";
 contract DeployFundMe is Script {
     function run() external returns (FundMe) {
         HelperConfig helperConfig = new HelperConfig();
-        address priceFeed = helperConfig.getConfig().priceFeed; // why does helperConfig.activeNetworkConfig.priceFeed not work here?
+        address priceFeed = helperConfig.getConfig().priceFeed;
 
         vm.startBroadcast();
         FundMe fundMe = new FundMe(priceFeed);
