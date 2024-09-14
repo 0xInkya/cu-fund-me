@@ -43,7 +43,7 @@ endif
 deploy-sepolia:
 	@forge script script/DeployFundMe.s.sol:DeployFundMe $(NETWORK_ARGS)
 
-# Address of the function caller goes here. Just put in $(DEFAULT_ANVIL_KEY) or $(SEPOLIA_ADDRESS)
+# Address of the function caller goes here. Just put in $(DEFAULT_ANVIL_ADDRESS) or $(SEPOLIA_ADDRESS)
 SENDER_ADDRESS := $(SEPOLIA_ADDRESS)
  
 fund:

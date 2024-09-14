@@ -29,7 +29,7 @@ contract TestFundMe is Test {
 
     function setUp() external {
         HelperConfig helperConfig = new HelperConfig();
-        address priceFeed = helperConfig.activeNetworkConfig();
+        address priceFeed = helperConfig.getConfig().priceFeed;
 
         vm.prank(DEPLOYER);
         fundMe = new FundMe(priceFeed);
