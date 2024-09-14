@@ -34,9 +34,10 @@ jobs:
           forge fmt --check
         id: fmt
 
-      # Run make install at the start
       - name: Run make install
-        run: make install
+        run: | 
+          make install
+        id: install
 
       - name: Run Forge build
         run: |
