@@ -7,12 +7,10 @@ import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
 import {Constants} from "script/HelperConfig.s.sol";
 import {FundMe} from "src/FundMe.sol";
 
-/**
- * All functions in this contract are called by the account passed to forge
- */
+// There has to be a better way to pass the value to the fund function
 contract FundFundMe is Script, Constants {
-    function fundFundMe(address mostRecentlyDeployed) public {
-        vm.startBroadcast();
+    function fundFundMe(address funder, address mostRecentlyDeployed) public {
+        vm.startBroadcast(funder);
         FundMe(payable(mostRecentlyDeployed)).fund{value: FUND_VALUE}();
         vm.stopBroadcast();
         console2.log("Funded FundMe with %s", FUND_VALUE);
@@ -20,14 +18,14 @@ contract FundFundMe is Script, Constants {
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("FundMe", block.chainid);
-        fundFundMe(mostRecentlyDeployed);
+        fundFundMe(msg.sender, mostRecentlyDeployed);
     }
 }
 
 contract WithdrawFundMe is Script {
-    function withdrawFundMe(address mostRecentlyDeployed) public {
+    function withdrawFundMe(address owner, address mostRecentlyDeployed) public {
         uint256 balance = mostRecentlyDeployed.balance;
-        vm.startBroadcast();
+        vm.startBroadcast(owner);
         FundMe(payable(mostRecentlyDeployed)).withdraw();
         vm.stopBroadcast();
         console2.log("Withdrawn %s from FundMe", balance);
@@ -35,6 +33,6 @@ contract WithdrawFundMe is Script {
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("FundMe", block.chainid);
-        withdrawFundMe(mostRecentlyDeployed);
+        withdrawFundMe(msg.sender, mostRecentlyDeployed);
     }
 }

@@ -3,11 +3,11 @@
 pragma solidity ^0.8.18;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {HelperConfig} from "script/HelperConfig.s.sol";
+import {HelperConfig, Constants} from "script/HelperConfig.s.sol";
 import {PriceConverter} from "src/PriceConverter.sol";
 import {FundMe} from "src/FundMe.sol";
 
-contract TestFundMe is Test {
+contract TestFundMe is Test, Constants {
     /**
      * To be able to set a custom deployer account, we cant use vm.broadcast.
      * In other words, we can't use the deploy script.
@@ -19,9 +19,6 @@ contract TestFundMe is Test {
 
     address OWNER = makeAddr("owner");
     address FUNDER = makeAddr("funder");
-
-    uint256 STARTING_BALANCE = 10 ether;
-    uint256 FUND_VALUE = 1 ether;
 
     modifier userFunded() {
         vm.prank(FUNDER);

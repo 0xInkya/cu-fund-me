@@ -12,6 +12,7 @@ abstract contract Constants {
     uint256 MAINNET_CHAIN_ID = 1;
 
     /* Magic Numbers */
+    uint256 STARTING_BALANCE = 10 ether;
     uint256 FUND_VALUE = 0.01 ether;
 }
 
