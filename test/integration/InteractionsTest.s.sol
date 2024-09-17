@@ -19,7 +19,7 @@ contract InteractionsTest is Test, Constants {
     /**
      * We cant pass an argument (like a deployer address) to the deploy script run function
      * So whenever we want to act as the deployer we need to call fundMe.getOwner()
-     * 
+     *
      * I also changed the interactions scripts to take in an address to pass to the broadcast function
      */
     function setUp() external {
