@@ -100,7 +100,7 @@ contract FundMe {
         uint256 amountWithdrawn = address(this).balance;
 
         /* Resetting array and mapping */
-        uint256 fundersLength = s_funders.length;
+        uint256 fundersLength = s_funders.length; // Temporary variable to iterate from memory instead of storage, which is more gas efficient
         for (uint256 i = 0; i < fundersLength; i++) {
             s_funderToAmountFunded[s_funders[i]] = 0;
         }
