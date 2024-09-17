@@ -24,6 +24,8 @@ update:; forge update
 build:; forge build
 
 test :; forge test -vvvvv
+test-unit :; forge test test/unit/FundMeTest.t.sol -vvv
+test-integration :; forge test test/integration/InteractionsTest.s.sol -vvv
 
 snapshot :; forge snapshot
 
@@ -44,7 +46,7 @@ deploy-sepolia:
 	@forge script script/DeployFundMe.s.sol:DeployFundMe $(NETWORK_ARGS)
 
 # Address of the function caller goes here. Just put in $(DEFAULT_ANVIL_ADDRESS) or $(SEPOLIA_ADDRESS)
-SENDER_ADDRESS := $(SEPOLIA_ADDRESS)
+SENDER_ADDRESS := $(DEFAULT_ANVIL_ADDRESS)
  
 fund:
 	@forge script script/Interactions.s.sol:FundFundMe --sender $(SENDER_ADDRESS) $(NETWORK_ARGS)
