@@ -107,8 +107,17 @@ contract FundMe {
         s_funders = new address[](0); // (0) specifies the initial length of the array
 
         /* Withdrawing funds from contract */
+        // // transfer
+        // payable(msg.sender).transfer(address(this).balance);
+
+        // // send
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // require(sendSuccess, "Send failed");
+
+        // call
         (bool success,) = i_owner.call{value: address(this).balance}("");
         if (!success) revert FundMe__WithdrawFailed();
+
         emit FundMe__ContractWithdrawn(amountWithdrawn);
     }
 
