@@ -7,7 +7,6 @@ import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
 import {Constants} from "script/HelperConfig.s.sol";
 import {FundMe} from "src/FundMe.sol";
 
-// There has to be a better way to pass the value to the fund function
 contract FundFundMe is Script, Constants {
     function fundFundMe(address funder, address mostRecentlyDeployed) public {
         vm.startBroadcast(funder);
